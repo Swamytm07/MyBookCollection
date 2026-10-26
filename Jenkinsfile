@@ -9,14 +9,14 @@ pipeline {
         stage('Build Docker Images') {
             steps {
                 script {
-                    sh 'docker compose build'
+                    bat 'docker compose build'
                 }
             }
         }
         stage('Deploy Application') {
             steps {
                 script {
-                    sh 'docker compose up -d'
+                    bat 'docker compose up -d'
                 }
             }
         }
