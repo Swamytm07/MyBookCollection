@@ -19,9 +19,7 @@ services:
       - db
 
   spring-service:
-    build:
-      context: .
-      dockerfile: SpringCRUD/Dockerfile
+    build: ./SpringCRUD
     environment:
       DATABASE_HOST: db
       DATABASE_PORT: 3306
