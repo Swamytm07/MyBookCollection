@@ -63,5 +63,22 @@ jobs:
       - name: Install Angular dependencies
         run: npm install --legacy-peer-deps --prefix ./AngularCRUD/
 
-      - name: Build Angular application
+          - name: Build Angular application
         run: npm run build --prefix ./AngularCRUD/
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build backend Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./SpringCRUD
+          push: false
+          tags: mybook-backend:ci
+
+      - name: Build frontend Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./AngularCRUD
+          push: false
+          tags: mybook-frontend:ci
