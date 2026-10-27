@@ -5,16 +5,8 @@ on:
 
 jobs:
   merge-me:
-    name: Merge me
+    name: Manual trigger confirmation
     runs-on: ubuntu-latest
     steps:
-      - name: Manual trigger confirmation
+      - name: Confirm automatic merging is disabled
         run: echo "Automatic merging is disabled."
-
-    steps:
-      - name: Merge me!
-        if: ${{ github.event.workflow_run.conclusion == 'success' }}
-        uses: ridedott/merge-me-action@v2.9.150
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PRESET: DEPENDABOT_MINOR
