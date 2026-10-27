@@ -58,5 +58,8 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
-      - run: npm install --prefix ./AngularCRUD/
-      - run: npm run build --prefix ./AngularCRUD/
+      - name: Install Angular dependencies
+  run: npm install --legacy-peer-deps --prefix ./AngularCRUD/
+
+- name: Build Angular application
+  run: npm run build --prefix ./AngularCRUD/
