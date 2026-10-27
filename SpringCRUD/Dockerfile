@@ -1,4 +1,4 @@
-FROM gradle:7.4-jdk17-alpline AS build
+FROM gradle:7.4-jdk17-alpine AS build
 
 WORKDIR /app
 
