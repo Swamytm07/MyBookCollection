@@ -1,6 +1,7 @@
+```yaml
 name: CI
 
-on: [ push, pull_request ]
+on: [push, pull_request]
 
 permissions:
   contents: read
@@ -9,23 +10,21 @@ permissions:
 
 jobs:
   build:
+    name: Build and Test Application
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node: [ '12', '14', '16' ]
-    name: Node ${{ matrix.node }} sample
-    
+
     steps:
-      - uses: actions/checkout@v3
-      
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
-          java-version: 17
-          distribution: 'temurin'
-          
+          java-version: '17'
+          distribution: temurin
+
       - name: Cache Gradle packages
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches
@@ -33,29 +32,17 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-          
-      - name: Unit Tests
+
+      - name: Run backend tests
         run: ./SpringCRUD/gradlew -p ./SpringCRUD test
-        
-      - name: Publish Unit Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v1.33
-        if: always()
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          check_name: Unit Test Results
-          files: SpringCRUD/build/test-results/test/TEST*.xml
-          report_individual_runs: true
-          deduplicate_classes_by_file_name: false
-        
-      - name: Unit Tests and static code analysis
-        if: success()
+
+      - name: Run Gradle checks
         run: ./SpringCRUD/gradlew -p ./SpringCRUD check
-        
-      - name: Build with Gradle
+
+      - name: Build backend
         run: ./SpringCRUD/gradlew -p ./SpringCRUD build
-        
-      
-      - name: Setup Node.js
+
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '16'
@@ -63,7 +50,149 @@ jobs:
       - name: Install Angular dependencies
         run: npm install --legacy-peer-deps --prefix ./AngularCRUD/
 
-          - name: Build Angular application
+      - name: Build Angular application
+        run: npm run build --prefix ./AngularCRUD/
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build backend Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./SpringCRUD
+          push: false
+          tags: mybook-backend:ci
+
+      - name: Build frontend Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./AngularCRUD
+          push: false
+          tags: mybook-frontend:ci
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
+jobs:
+  build:
+    name: Build and Test Application
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: temurin
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Run backend tests
+        run: ./SpringCRUD/gradlew -p ./SpringCRUD test
+
+      - name: Run Gradle checks
+        run: ./SpringCRUD/gradlew -p ./SpringCRUD check
+
+      - name: Build backend
+        run: ./SpringCRUD/gradlew -p ./SpringCRUD build
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '16'
+
+      - name: Install Angular dependencies
+        run: npm install --legacy-peer-deps --prefix ./AngularCRUD/
+
+      - name: Build Angular application
+        run: npm run build --prefix ./AngularCRUD/
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build backend Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./SpringCRUD
+          push: false
+          tags: mybook-backend:ci
+
+      - name: Build frontend Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./AngularCRUD
+          push: false
+          tags: mybook-frontend:ci
+``````yaml
+name: CI
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
+jobs:
+  build:
+    name: Build and Test Application
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: temurin
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Run backend tests
+        run: ./SpringCRUD/gradlew -p ./SpringCRUD test
+
+      - name: Run Gradle checks
+        run: ./SpringCRUD/gradlew -p ./SpringCRUD check
+
+      - name: Build backend
+        run: ./SpringCRUD/gradlew -p ./SpringCRUD build
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '16'
+
+      - name: Install Angular dependencies
+        run: npm install --legacy-peer-deps --prefix ./AngularCRUD/
+
+      - name: Build Angular application
         run: npm run build --prefix ./AngularCRUD/
 
       - name: Set up Docker Buildx
