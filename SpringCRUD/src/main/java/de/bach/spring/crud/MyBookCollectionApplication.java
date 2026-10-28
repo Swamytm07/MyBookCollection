@@ -1,3 +1,4 @@
+
 package de.bach.spring.crud;
 
 import de.bach.spring.crud.model.Book;
@@ -23,6 +24,11 @@ public class MyBookCollectionApplication implements CommandLineRunner {
 
     @Override
     public void run(final String... args) {
+        if (repository.count() > 0) {
+            System.out.println("Books already exist. Skipping sample data initialization.");
+            return;
+        }
+
         repository.saveAll(List.of(
                 new Book(null, "Spring Start Here", "9781617298691", "Java", "10/1/2021",
                         "finished reading", "5/5", BigDecimal.valueOf(28.39)),
@@ -35,5 +41,7 @@ public class MyBookCollectionApplication implements CommandLineRunner {
                 new Book(null, "Docker", "9783836286343", "DevOps", "9/1/2021",
                         "not yet read", "?/5", BigDecimal.valueOf(39.90))
         ));
+
+        System.out.println("Sample books inserted successfully.");
     }
 }
