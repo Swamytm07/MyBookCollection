@@ -33,3 +33,4 @@ The docker compose setup includes Adminer for adminstrating the data base. Once 
 
 CI/CD automation test using Jenkins and Docker.
 Testing Jenkins automatic polling.
+Now i wnat to do the changes 
