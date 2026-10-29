@@ -6,6 +6,8 @@ import de.bach.spring.crud.repository.BookRepository;
 import java.math.BigDecimal;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -14,6 +16,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 @RequiredArgsConstructor
 public class MyBookCollectionApplication implements CommandLineRunner {
+
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(MyBookCollectionApplication.class);
 
     private final BookRepository repository;
 
@@ -25,7 +30,7 @@ public class MyBookCollectionApplication implements CommandLineRunner {
     @Override
     public void run(final String... args) {
         if (repository.count() > 0) {
-            System.out.println("Books already exist. Skipping sample data initialization.");
+            LOGGER.info("Books already exist. Skipping sample data initialization.");
             return;
         }
 
@@ -42,6 +47,6 @@ public class MyBookCollectionApplication implements CommandLineRunner {
                         "not yet read", "?/5", BigDecimal.valueOf(39.90))
         ));
 
-        System.out.println("Sample books inserted successfully.");
+        LOGGER.info("Sample books inserted successfully.");
     }
 }

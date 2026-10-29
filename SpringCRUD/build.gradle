@@ -43,6 +43,7 @@ pmd {
             "category/java/performance.xml",
             "category/java/security.xml"
     ]
+    ruleSetFiles = files()
 }
 
 configurations {
