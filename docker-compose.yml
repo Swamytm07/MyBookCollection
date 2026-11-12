@@ -1,4 +1,5 @@
-version: '3.1'
+
+
 
 services:
   db:
@@ -9,6 +10,8 @@ services:
     environment:
       MYSQL_DATABASE: bookDatabase
       MYSQL_ROOT_PASSWORD: springCRUD
+    volumes:
+      - mysql_data:/var/lib/mysql
 
   adminer:
     image: adminer
@@ -30,7 +33,7 @@ services:
     depends_on:
       - db
     restart: on-failure
-    
+
   angular-service:
     build: ./AngularCRUD
     ports:
@@ -38,3 +41,8 @@ services:
     expose:
       - "4200"
     restart: unless-stopped
+
+volumes:
+  mysql_data:
+    external: true
+    name: d4111a5bb0db8b990a8babc5e34f65fc4b50fdb97c21c55f26d54f2e5ec88e76
