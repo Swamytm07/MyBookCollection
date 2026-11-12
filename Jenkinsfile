@@ -1,4 +1,4 @@
- 
+
 pipeline {
     agent any
 
@@ -7,6 +7,7 @@ pipeline {
     }
 
     stages {
+
         stage('Checkout Code') {
             steps {
                 git branch: 'main',
@@ -16,38 +17,75 @@ pipeline {
 
         stage('Validate Tools') {
             steps {
+                echo 'Checking Git and Docker versions...'
+
                 bat '"C:\\Program Files\\Git\\ucrt64\\bin\\git.exe" --version'
+
                 bat '"%DOCKER%" --version'
+
                 bat '"%DOCKER%" compose version'
             }
         }
 
         stage('Validate Docker Compose') {
             steps {
+                echo 'Validating Docker Compose configuration...'
+
                 bat '"%DOCKER%" compose -p mybookspipeline config --quiet'
             }
         }
 
         stage('Build Docker Images') {
             steps {
+                echo 'Building Angular and Spring Boot Docker images...'
+
                 bat '"%DOCKER%" compose -p mybookspipeline build'
             }
         }
 
         stage('Deploy Application') {
             steps {
+                echo 'Deploying the MyBookCollection application...'
+
                 bat '"%DOCKER%" compose -p mybookspipeline up -d'
             }
         }
 
         stage('Verify Deployment') {
             steps {
+                echo 'Checking running Docker containers...'
+
                 bat '"%DOCKER%" compose -p mybookspipeline ps'
 
-                bat 'powershell -NoProfile -Command "$deadline=(Get-Date).AddSeconds(120); do { try { $r=Invoke-WebRequest -Uri http://localhost:8082/allBooks -UseBasicParsing -TimeoutSec 5; if ($r.StatusCode -eq 200) { Write-Output $r.Content; exit 0 } } catch {}; Start-Sleep -Seconds 5 } while ((Get-Date) -lt $deadline); exit 1"'
+                echo 'Checking Spring Boot backend API...'
 
-                bat 'powershell -NoProfile -Command "$r=Invoke-WebRequest -Uri http://localhost:4200/ -UseBasicParsing; if ($r.StatusCode -ne 200) { exit 1 }; Write-Output $r.StatusCode"'
+                bat 'powershell -NoProfile -Command "Invoke-RestMethod http://localhost:8082/allBooks -TimeoutSec 120 | ConvertTo-Json -Depth 5"'
+
+                echo 'Checking Angular frontend...'
+
+                bat 'powershell -NoProfile -Command "Invoke-WebRequest http://localhost:4200/ -UseBasicParsing | Select-Object -ExpandProperty StatusCode"'
             }
+        }
+    }
+
+    post {
+        success {
+            echo '=========================================='
+            echo 'MyBookCollection CI/CD PIPELINE SUCCESS!'
+            echo '=========================================='
+            echo 'Frontend: http://localhost:4200'
+            echo 'Backend:  http://localhost:8082/allBooks'
+            echo 'Adminer:  http://localhost:8081'
+            echo '=========================================='
+        }
+
+        failure {
+            echo 'MyBookCollection CI/CD PIPELINE FAILED.'
+            echo 'Check the Console Output for the error.'
+        }
+
+        always {
+            echo 'Pipeline execution completed.'
         }
     }
 }
