@@ -16,7 +16,7 @@ pipeline {
 
         stage('Validate Tools') {
             steps {
-                bat 'git --version'
+                bat '"C:\\Program Files\\Git\\ucrt64\\bin\\git.exe" --version'
                 bat '"%DOCKER%" --version'
                 bat '"%DOCKER%" compose version'
             }
