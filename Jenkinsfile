@@ -58,25 +58,27 @@ pipeline {
             }
         }
 
-        stage('Verify Deployment') {
-            steps {
-                echo 'Checking running Docker containers...'
+        
+stage('Verify Deployment') {
+    steps {
+        echo 'Checking Docker containers...'
 
-                bat '"%DOCKER%" compose -p %COMPOSE_PROJECT% ps'
+        bat '"%DOCKER%" compose -p %COMPOSE_PROJECT% ps'
 
-                echo 'Checking Spring Boot backend API...'
+        echo 'Checking Spring Boot backend API...'
 
-                bat '"%POWERSHELL%" -NoProfile -Command "$deadline=(Get-Date).AddSeconds(120); do { try { $response=Invoke-RestMethod -Uri http://localhost:8082/allBooks -TimeoutSec 5; $response | ConvertTo-Json -Depth 5; exit 0 } catch { Write-Output ''Backend not ready yet...''; Start-Sleep -Seconds 5 } } while ((Get-Date) -lt $deadline); Write-Error ''Backend API verification failed''; exit 1"'
+        bat '''"%POWERSHELL%" -NoProfile -Command "$deadline=(Get-Date).AddSeconds(120); do { try { $r=Invoke-WebRequest -Uri http://localhost:8082/allBooks -UseBasicParsing -TimeoutSec 5; if ($r.StatusCode -eq 200) { Write-Output $r.Content; exit 0 } } catch { Write-Output 'Backend not ready yet'; Start-Sleep -Seconds 5 } } while ((Get-Date) -lt $deadline); Write-Error 'Backend API verification failed'; exit 1"'''
 
-                echo 'Checking Angular frontend...'
+        echo 'Checking Angular frontend...'
 
-                bat '"%POWERSHELL%" -NoProfile -Command "$response=Invoke-WebRequest -Uri http://localhost:4200/ -UseBasicParsing -TimeoutSec 30; Write-Output (''Angular HTTP Status: '' + $response.StatusCode); if ($response.StatusCode -ne 200) { exit 1 }"'
+        bat '''"%POWERSHELL%" -NoProfile -Command "$r=Invoke-WebRequest -Uri http://localhost:4200/ -UseBasicParsing -TimeoutSec 30; Write-Output $r.StatusCode; if ($r.StatusCode -ne 200) { exit 1 }"'''
 
-                echo 'Checking Adminer availability...'
+        echo 'Checking Adminer...'
 
-                bat '"%POWERSHELL%" -NoProfile -Command "$response=Invoke-WebRequest -Uri http://localhost:8081/ -UseBasicParsing -TimeoutSec 30; Write-Output (''Adminer HTTP Status: '' + $response.StatusCode); if ($response.StatusCode -ne 200) { exit 1 }"'
-            }
-        }
+        bat '''"%POWERSHELL%" -NoProfile -Command "$r=Invoke-WebRequest -Uri http://localhost:8081/ -UseBasicParsing -TimeoutSec 30; Write-Output $r.StatusCode; if ($r.StatusCode -ne 200) { exit 1 }"'''
+    }
+}
+
     }
 
     post {
