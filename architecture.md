@@ -1,5 +1,3 @@
-
-
 \# MyBookCollection - 3-Tier Architecture
 
 
@@ -69,4 +67,43 @@
 \- Jenkins: CI/CD automation.
 
 
+## Architecture Diagram
+
+
+
+```mermaid
+
+flowchart TD
+
+&#x20;   U\[User / Browser]
+
+&#x20;   FE\[Presentation Tier<br/>Angular 13 + Nginx<br/>Port 4200]
+
+&#x20;   BE\[Application Tier<br/>Java 17 + Spring Boot<br/>Port 8082]
+
+&#x20;   DB\[(Database Tier<br/>MySQL<br/>bookDatabase<br/>Port 3306)]
+
+
+
+&#x20;   U --> FE
+
+&#x20;   FE -->|REST API| BE
+
+&#x20;   BE -->|Database connection| DB
+
+
+
+&#x20;   GH\[GitHub Repository] --> J\[Jenkins CI/CD]
+
+&#x20;   J --> D\[Docker Compose]
+
+&#x20;   D --> FE
+
+&#x20;   D --> BE
+
+&#x20;   D --> DB
+
+
+
+&#x20;   A\[Adminer<br/>Port 8081] --> DB
 
